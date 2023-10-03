@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+
 import { invoke } from '@tauri-apps/api/tauri';
 
 export default {

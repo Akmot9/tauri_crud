@@ -5,7 +5,6 @@
       <p>A simple CRUD application using Tauri and Rust's Rusqlite</p>
     </header>
     <main>
-
       <section>
         <h2>Get Table Component</h2>
         <GetTable />
