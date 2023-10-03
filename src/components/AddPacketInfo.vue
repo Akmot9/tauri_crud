@@ -17,6 +17,8 @@
   </template>
   
   <script>
+  import { invoke } from '@tauri-apps/api'
+
   export default {
     data() {
       return {
@@ -37,24 +39,8 @@
       async submitForm() {
         try {
           // Send the packetInfo object to Rust for insertion
-          const response = await this.$tauri.invoke("insert_packet_info", this.packetInfo);
-          if (response) {
-            // Reset the form after successful insertion
-            this.packetInfo = {
-              mac_source: "",
-              mac_destination: "",
-              ethertype: "",
-              ip_source: "",
-              ip_destination: "",
-              protocol: "",
-              port_source: "",
-              port_destination: "",
-              count: 0,
-            };
-            alert("Packet info added successfully!");
-          } else {
-            alert("Failed to add packet info.");
-          }
+          invoke('insert_packet_info', {packet_info: this.packetInfo})
+          .then((response) => console.log(response))
         } catch (error) {
           console.error(error);
           alert("An error occurred while adding packet info.");
