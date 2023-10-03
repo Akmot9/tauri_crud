@@ -16,15 +16,10 @@ struct PacketInfo {
     count: u32,
 }
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
 
 #[tauri::command]
-fn create_table() -> Result<PacketInfo> {
-    println!("mohamed t'es mort !");
+fn create_table() -> Result<()> {
+    
     // Ouvrez une connexion à la base de données SQLite
     let conn = Connection::open("my_database.db").unwrap();
 
@@ -44,20 +39,48 @@ fn create_table() -> Result<PacketInfo> {
         )",
         [],
     ).unwrap();
+    println!("table created.");
+    Ok(())
 
-    let packet_info = PacketInfo {
-        mac_source: "aa:bb:cc:dd:ee:f2".to_string(),
-        mac_destination: "11:22:33:44:55:66".to_string(),
-        ethertype: "IPv4".to_string(),
-        ip_source: "192.0.2.1".to_string(),
-        ip_destination: "192.0.2.2".to_string(),
-        protocol: "TCP".to_string(),
-        port_source: "80".to_string(),
-        port_destination: "8080".to_string(),
-        count: 1,
-    };
+}
 
-    // Insérez les données dans la table
+#[tauri::command]
+fn get_packet_infos() -> Result<Vec<PacketInfo>> {
+    // Open a connection to the SQLite database
+    let conn = Connection::open("my_database.db").unwrap();
+
+    // Retrieve data from the table
+    let mut stmt = conn.prepare("SELECT * FROM packet_info").unwrap();
+    let packet_info_iter = stmt.query_map([], |row| {
+        Ok(PacketInfo {
+            mac_source: row.get(1)?,
+            mac_destination: row.get(2)?,
+            ethertype: row.get(3)?,
+            ip_source: row.get(4)?,
+            ip_destination: row.get(5)?,
+            protocol: row.get(6)?,
+            port_source: row.get(7)?,
+            port_destination: row.get(8)?,
+            count: row.get(9)?,
+        })
+    }).unwrap();
+
+    let mut packet_infos = Vec::new();
+
+    for packet_info in packet_info_iter {
+        packet_infos.push(packet_info.unwrap());
+    }
+
+    Ok(packet_infos)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+fn insert_packet_info(packet_info: PacketInfo) -> Result<()> {
+    println!("I was invoked from JS, with this message: {:?}", &packet_info);
+    // Open a connection to the SQLite database
+    let conn = Connection::open("my_database.db").unwrap();
+
+    // Insert the provided `PacketInfo` into the table
     conn.execute(
         "INSERT INTO packet_info (mac_source, mac_destination, ethertype, ip_source, ip_destination, protocol, port_source, port_destination, count)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
@@ -74,33 +97,13 @@ fn create_table() -> Result<PacketInfo> {
         ],
     ).unwrap();
 
-    // Récupérez les données de la table
-    let mut stmt = conn.prepare("SELECT * FROM packet_info").unwrap();
-    let packet_info_iter = stmt.query_map([], |row| {
-        Ok(PacketInfo {
-            mac_source: row.get(1)?,
-            mac_destination: row.get(2)?,
-            ethertype: row.get(3)?,
-            ip_source: row.get(4)?,
-            ip_destination: row.get(5)?,
-            protocol: row.get(6)?,
-            port_source: row.get(7)?,
-            port_destination: row.get(8)?,
-            count: row.get(9)?,
-        })
-    }).unwrap();
-
-    for packet_info in packet_info_iter {
-        println!("{:#?}", packet_info.unwrap());
-        
-    }
-    Ok(packet_info)
-
+    Ok(())
 }
+
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet,create_table])
+        .invoke_handler(tauri::generate_handler![create_table,insert_packet_info, get_packet_infos])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
