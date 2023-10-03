@@ -100,7 +100,6 @@ fn insert_packet_info(packet_info: PacketInfo) -> Result<()> {
     Ok(())
 }
 
-
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![create_table,insert_packet_info, get_packet_infos])
