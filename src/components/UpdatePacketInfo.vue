@@ -8,7 +8,7 @@
         </div>
         <div class="form-group">
           <label for="count">New count:</label>
-          <input type="text" id="count" v-model="packetInfo.count" required />
+          <input type="number" id="count" v-model="packetInfo.count" required />
         </div>
         <!-- Add other form fields for PacketInfo properties -->
         <button type="submit">Update Packet Info</button>

@@ -100,7 +100,7 @@ fn insert_packet_info(packet_info: PacketInfo) -> Result<()> {
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 fn update_packet_info(new_packet_info: PacketInfo) -> Result<()> {
     // Open a connection to the SQLite database
     let conn = Connection::open("my_database.db").unwrap();
