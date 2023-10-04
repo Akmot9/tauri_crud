@@ -100,9 +100,29 @@ fn insert_packet_info(packet_info: PacketInfo) -> Result<()> {
     Ok(())
 }
 
+#[tauri::command]
+fn update_packet_info(new_packet_info: PacketInfo) -> Result<()> {
+    // Open a connection to the SQLite database
+    let conn = Connection::open("my_database.db").unwrap();
+
+    // Update the PacketInfo record with the provided `id`
+    conn.execute(
+        "UPDATE packet_info
+         SET count = ?2
+         WHERE mac_source = ?1",
+        params![
+            new_packet_info.mac_source,
+            new_packet_info.count,
+        ],
+    ).unwrap();
+    println!("{:?}",new_packet_info);
+
+    Ok(())
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![create_table,insert_packet_info, get_packet_infos])
+        .invoke_handler(tauri::generate_handler![create_table,insert_packet_info, get_packet_infos, update_packet_info])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

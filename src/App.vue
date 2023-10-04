@@ -19,6 +19,11 @@
         <h2>Create Table Component</h2>
         <CreatTable />
       </section>
+
+      <section>
+        <h2>Update Table Component</h2>
+        <UpdatePacketInfo />
+      </section>
     </main>
   </div>
 </template>
@@ -29,6 +34,7 @@
 import GetTable from "./components/GetTable.vue";
 import AddPacketInfo from "./components/AddPacketInfo.vue";
 import CreatTable from "./components/CreatTable.vue";
+import UpdatePacketInfo from "./components/UpdatePacketInfo.vue";
 </script>
 
 <style scoped>
